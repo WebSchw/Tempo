@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Exclude fetched brise data
+/data/*.csv
+
+# Exclude idea folder
+.idea/
