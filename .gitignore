@@ -133,3 +133,8 @@ csv_files/
 
 # Exclude idea folder
 .idea/
+
+
+# Exclude actual data
+data/input/
+data/csv_files
