@@ -12,8 +12,7 @@ setup(
         "numpy==1.23.3",
         "torch==1.12.1",
         "pandas==1.5.0",
-        "scikit-learn==1.1.2",
-        "requests==2.28.1"
+        "scikit-learn==1.1.2"
     ],
     packages=find_packages(),
     classifiers=[

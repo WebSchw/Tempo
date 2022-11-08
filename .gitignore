@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Exclude fetched brise data
-/data/*.csv
+csv_files/
 
 # Exclude idea folder
 .idea/
