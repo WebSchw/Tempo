@@ -6,7 +6,10 @@ from tuwnlpie.milestone1.utils import (
     calculate_tp_fp_fn,
     read_docs_from_csv,
     split_train_dev_test,
+    read_preprocessed_features,
+    get_xy
 )
+from sklearn.ensemble import RandomForestClassifier
 
 from tuwnlpie.milestone2.model import BoWClassifier
 from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
@@ -39,6 +42,17 @@ def train_milestone2(train_data, save=False, save_path=None):
 
     if save:
         model.save_model(save_path)
+
+    return
+
+def train_milestone_1(path_to_features,save=False, save_path=None):
+    model= RandomForestClassifier(n_estimators = 100, criterion = 'entropy', random_state = 42)
+    features,labels=read_preprocessed_features(path_to_features)
+    x,y=get_xy(features,labels)
+    model.fit(x, y)
+    if save:
+        model.save_model(save_path)
+        logger.info(f"Saved model to {save_path}")
 
     return
 

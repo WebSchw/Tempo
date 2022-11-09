@@ -3,6 +3,7 @@ import csv
 import nltk
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 
 
 def read_docs_from_csv(filename):
@@ -14,6 +15,9 @@ def read_docs_from_csv(filename):
             docs.append((words, label))
 
     return docs
+
+
+
 
 
 def split_train_dev_test(docs, train_ratio=0.8, dev_ratio=0.1):
@@ -46,3 +50,14 @@ def calculate_tp_fp_fn(y_true, y_pred):
     fscore = 2 * precision * recall / (precision + recall)
 
     return tp, fp, fn, precision, recall, fscore
+
+
+def read_preprocessed_features(data_path):
+    features = pd.read_csv(data_path + 'features.csv')
+    labels = pd.read_csv(data_path + 'labels.csv')
+    return  features,labels
+
+def get_xy(features,labels):
+    x=features.iloc[:, 2:].copy()
+    y=labels.iloc[:, 2:].copy()
+    return x,y
