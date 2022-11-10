@@ -1,9 +1,12 @@
 import csv
-
-import nltk
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
+from os import path
+import nltk
+from data.get_data import get_data
+from os import getcwd
+from os import chdir
 
 
 def read_docs_from_csv(filename):
@@ -17,9 +20,6 @@ def read_docs_from_csv(filename):
     return docs
 
 
-
-
-
 def split_train_dev_test(docs, train_ratio=0.8, dev_ratio=0.1):
     np.random.seed(2022)
     np.random.shuffle(docs)
@@ -27,8 +27,8 @@ def split_train_dev_test(docs, train_ratio=0.8, dev_ratio=0.1):
     dev_size = int(len(docs) * dev_ratio)
     return (
         docs[:train_size],
-        docs[train_size : train_size + dev_size],
-        docs[train_size + dev_size :],
+        docs[train_size: train_size + dev_size],
+        docs[train_size + dev_size:],
     )
 
 
@@ -53,11 +53,23 @@ def calculate_tp_fp_fn(y_true, y_pred):
 
 
 def read_preprocessed_features(data_path):
-    features = pd.read_csv(data_path + 'features.csv')
-    labels = pd.read_csv(data_path + 'labels.csv')
-    return  features,labels
+    set_name = data_path.split("/")[-1].split("_")[0]
+    dir_name = data_path.rsplit("/", 1)[0]
+    current_dir = getcwd()
+    if not path.exists(f"{dir_name}/{set_name}_data.csv"):
+        chdir(dir_name)
+        get_data(do_preprocess=False)
+        chdir(current_dir)
+    if not path.exists(f"{dir_name}/{set_name}_features.csv"):
+        chdir(dir_name)
+        get_data(do_preprocess=True)
+        chdir(current_dir)
+    features = pd.read_csv(f"{dir_name}/{set_name}_features.csv")
+    labels = pd.read_csv(f"{dir_name}/{set_name}_labels.csv")
+    return features, labels
 
-def get_xy(features,labels):
-    x=features.iloc[:, 2:].copy()
-    y=labels.iloc[:, 2:].copy()
-    return x,y
+
+def get_xy(features, labels):
+    x = features.iloc[:, 2:].copy()
+    y = labels.iloc[:, 2:].copy()
+    return x, y

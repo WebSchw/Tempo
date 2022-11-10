@@ -16,22 +16,6 @@ from tuwnlpie.milestone2.model import BoWClassifier
 from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
 
 
-def train_milestone1(train_data, save=False, save_path=None):
-    model = SimpleNBClassifier()
-    docs = read_docs_from_csv(train_data)
-
-    train_docs, dev_docs, test_docs = split_train_dev_test(docs)
-
-    model.count_words(train_docs)
-    model.calculate_weights()
-
-    if save:
-        model.save_model(save_path)
-        logger.info(f"Saved model to {save_path}")
-
-    return
-
-
 def train_milestone2(train_data, save=False, save_path=None):
     logger.info("Loading data...")
     dataset = IMDBDataset(train_data)
@@ -49,13 +33,12 @@ def train_milestone2(train_data, save=False, save_path=None):
 
 def train_on_preprocessed_milestone_1(path_to_data, save=False, save_path=None):
     model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
-    features, labels = read_preprocessed_features(path_to_data + 'train_')
+    features, labels = read_preprocessed_features(path_to_data)
     x, y = get_xy(features, labels)
     model.fit(x, y)
     if save:
         pickle.dump(model, open(save_path, 'wb'))
         logger.info(f"Saved model to {save_path}")
-
     return
 
 

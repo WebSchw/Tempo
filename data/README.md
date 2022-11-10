@@ -2,9 +2,15 @@
 
 This folder contains two scripts to download the BRISE data.
 
-### Script 1: `download.py`
+### Script 1: `get_data.py`
 
-This script just downloads the three baseline csv files from github that do not contain features or labels. These labels and features are then extracted in a preprocessing-step.
+This python script offers the possibility to either just download the three baseline csv files from github, just preprocess already downloaded data or download the data and directly preprocess it.
+
+- `python get_data.py -d`: just download the csv files
+- `python get_data.py -p`: just preprocess the data
+- `python get_data.py -dp`: download the data and preprocess it right after
+
+Note: Preprocessing might take a while. If you are executing scripts that require downloaded and preprocessed data, `python get_data.py -dp` is  called automatically.
 
 ### Script 2: `download.sh`
 

@@ -76,6 +76,12 @@ def get_args():
     return parser.parse_args()
 
 
+def get_data(do_preprocess):
+    if not do_preprocess:
+        download()
+    else:
+        preprocess()
+
 if "__main__" == __name__:
     args = get_args()
     if not args.download_and_preprocess_data and not args.download_data and not args.preprocess_data:
