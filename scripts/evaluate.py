@@ -17,27 +17,24 @@ from tuwnlpie.milestone2.model import BoWClassifier
 from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
 
 
-def evaluate_milestone1(test_data, saved_model, split=False):
+def evaluate_milestone1(test_data, saved_model):
+    logger.info("Evaluating...")
     features, labels = read_preprocessed_features(test_data)
-    model=pickle.load(open(saved_model,"rb"))
+    model = pickle.load(open(saved_model, "rb"))
     x, y_true = get_xy(features, labels)
-    y_pred=model.predict(x)
+    y_pred = model.predict(x)
     conf_matrix = multilabel_confusion_matrix(y_true, y_pred)
-    labels=y_true.columns
+    labels = y_true.columns
 
     for index in range(len(conf_matrix)):
-        print(f"for label {labels[index]} Confusion matrix:")
-        print(conf_matrix[0])
+        print(f"Confusion Matrix for Label: {labels[index]}:")
+        print(conf_matrix[index])
         print("\n")
-
-
-
-
 
     return
 
 
-def evaluate_milestone2(test_data, saved_model, split=False):
+def evaluate_milestone2(test_data, saved_model, split):
     logger.info("Loading data...")
     dataset = IMDBDataset(test_data)
     model = BoWClassifier(dataset.OUT_DIM, dataset.VOCAB_SIZE)
@@ -77,18 +74,14 @@ def get_args():
 
 
 if "__main__" == __name__:
-    #args = get_args()
-    test_data=r"data/input/test_data.csv"
-    model=r"data\models\rf"
-    split=None
-    milestone=1
+    args = get_args()
 
-    # test_data = args.test_data
-    # model = args.saved_model
-    # split = args.split
-    # milestone = args.milestone
+    test_data = args.test_data
+    model = args.saved_model
+    split = args.split
+    milestone = args.milestone
 
     if milestone == 1:
-        evaluate_milestone1(test_data, model, split=split)
+        evaluate_milestone1(test_data, model)
     elif milestone == 2:
         evaluate_milestone2(test_data, model, split=split)

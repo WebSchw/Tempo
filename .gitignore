@@ -140,4 +140,5 @@ data/csv_files
 
 # Exclude actual data
 data/*.csv
+data/*.tsv
 
