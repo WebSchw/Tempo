@@ -1,4 +1,5 @@
 import argparse
+import pickle
 
 from tuwnlpie import logger
 from tuwnlpie.milestone1.model import SimpleNBClassifier
@@ -45,13 +46,14 @@ def train_milestone2(train_data, save=False, save_path=None):
 
     return
 
-def train_milestone_1(path_to_features,save=False, save_path=None):
-    model= RandomForestClassifier(n_estimators = 100, criterion = 'entropy', random_state = 42)
-    features,labels=read_preprocessed_features(path_to_features)
-    x,y=get_xy(features,labels)
+
+def train_on_preprocessed_milestone_1(path_to_data, save=False, save_path=None):
+    model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
+    features, labels = read_preprocessed_features(path_to_data + 'train_')
+    x, y = get_xy(features, labels)
     model.fit(x, y)
     if save:
-        model.save_model(save_path)
+        pickle.dump(model, open(save_path, 'wb'))
         logger.info(f"Saved model to {save_path}")
 
     return
@@ -60,7 +62,7 @@ def train_milestone_1(path_to_features,save=False, save_path=None):
 def get_args():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
-        "-t", "--train-data", type=str, required=True, help="Path to training data"
+        "-t", "--train-data", type=str, required=True, help="Path to folder in which are training data stored"
     )
     parser.add_argument(
         "-s", "--save", default=False, action="store_true", help="Save model"
@@ -84,6 +86,6 @@ if "__main__" == __name__:
     milestone = args.milestone
 
     if milestone == 1:
-        train_milestone1(train_data, save=model_save, save_path=model_save_path)
+        train_on_preprocessed_milestone_1(train_data, save=model_save, save_path=model_save_path)
     elif milestone == 2:
         train_milestone2(train_data, save=model_save, save_path=model_save_path)
