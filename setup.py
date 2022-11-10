@@ -10,9 +10,13 @@ setup(
     install_requires=[
         "nltk==3.7",
         "numpy==1.23.3",
-        "torch==1.12.1",
+        "torch==1.13.0",
         "pandas==1.5.0",
-        "scikit-learn==1.1.2"
+        "scikit-learn==1.1.2",
+        "requests==2.28.1",
+        "matplotlib==3.6.2",
+        "seaborn==0.12.0",
+        "stanza~=1.4.2"
     ],
     packages=find_packages(),
     classifiers=[

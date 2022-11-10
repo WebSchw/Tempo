@@ -134,7 +134,10 @@ csv_files/
 # Exclude idea folder
 .idea/
 
-
-# Exclude actual data
+# Should not be required anymore but is kept in case legacy data is locally stored
 data/input/
 data/csv_files
+
+# Exclude actual data
+data/*.csv
+
