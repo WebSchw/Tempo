@@ -1,6 +1,8 @@
 import argparse
 import pickle
 
+from sklearn.neural_network import MLPClassifier
+
 from tuwnlpie import logger
 from tuwnlpie.milestone1.model import SimpleNBClassifier
 from tuwnlpie.milestone1.utils import (
@@ -32,7 +34,8 @@ def train_milestone2(train_data, save=False, save_path=None):
 
 
 def train_on_preprocessed_milestone_1(path_to_data, save=False, save_path=None):
-    model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
+    #model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
+    model=classifier_deep = MLPClassifier(random_state=1, max_iter=290)
     features, labels = read_preprocessed_features(path_to_data)
     x, y = get_xy(features, labels)
     model.fit(x, y)
