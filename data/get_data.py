@@ -4,12 +4,14 @@ import nltk
 import stanza
 import pandas as pd
 import ast
+from tuwnlpie import logger
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.preprocessing import MultiLabelBinarizer
 from data.constants import ALL_LABELS_SORTED
 
 
 def download():
+    logger.info("Downloading data...")
     csv_urls = [
         "https://raw.githubusercontent.com/recski/brise-plandok/main/brise_plandok/baselines/input/test_data.csv",
         "https://raw.githubusercontent.com/recski/brise-plandok/main/brise_plandok/baselines/input/train_data.csv",
@@ -19,9 +21,11 @@ def download():
         r = requests.get(url, allow_redirects=True)
         set = url.split("/")[-1].split("_")[0]
         open(f'{set}_data.csv', 'wb').write(r.content)
+    logger.info("Data has been downloaded successfully")
 
 
 def preprocess():
+    logger.info("Preprocessing data...")
     nltk.download('stopwords')
     german_stop_words = nltk.corpus.stopwords.words('german')
     stanza.download('de')
@@ -59,6 +63,7 @@ def preprocess():
     vocab = preprocess_df(train_df, 'train')
     preprocess_df(valid_df, 'valid', vocab)
     preprocess_df(test_df, 'test', vocab)
+    logger.info("Data has been preprocessed successfully")
 
 
 def get_args():
@@ -81,6 +86,7 @@ def get_data(do_preprocess):
         download()
     else:
         preprocess()
+
 
 if "__main__" == __name__:
     args = get_args()
