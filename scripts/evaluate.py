@@ -1,11 +1,16 @@
 import argparse
+import pickle
+
+from sklearn.metrics import multilabel_confusion_matrix
 
 from tuwnlpie import logger
-from tuwnlpie.milestone1.model import SimpleNBClassifier
+from sklearn.neural_network import MLPClassifier
 from tuwnlpie.milestone1.utils import (
     calculate_tp_fp_fn,
     read_docs_from_csv,
     split_train_dev_test,
+    read_preprocessed_features,
+    get_xy
 )
 
 from tuwnlpie.milestone2.model import BoWClassifier
@@ -13,33 +18,21 @@ from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
 
 
 def evaluate_milestone1(test_data, saved_model, split=False):
-    model = SimpleNBClassifier()
-    model.load_model(saved_model)
-    docs = read_docs_from_csv(test_data)
-    test_docs = None
+    features, labels = read_preprocessed_features(test_data)
+    model=pickle.load(open(saved_model,"rb"))
+    x, y_true = get_xy(features, labels)
+    y_pred=model.predict(x)
+    conf_matrix = multilabel_confusion_matrix(y_true, y_pred)
+    labels=y_true.columns
 
-    if split:
-        _, _, test_docs = split_train_dev_test(docs)
-    else:
-        test_docs = docs
+    for index in range(len(conf_matrix)):
+        print(f"for label {labels[index]} Confusion matrix:")
+        print(conf_matrix[0])
+        print("\n")
 
-    y_true = []
-    y_pred = []
-    for doc in test_docs:
-        pred = model.predict_label(doc[0])
-        y_true.append(doc[1])
-        y_pred.append(pred)
-        logger.info(f"Predicted: {pred}, True: {doc[1]}")
 
-    tp, fp, fn, precision, recall, fscore = calculate_tp_fp_fn(y_true, y_pred)
 
-    print("Statistics:")
-    print(f"TP: {tp}")
-    print(f"FP: {fp}")
-    print(f"FN: {fn}")
-    print(f"Precision: {precision}")
-    print(f"Recall: {recall}")
-    print(f"F1-Score: {fscore}")
+
 
     return
 
@@ -84,12 +77,16 @@ def get_args():
 
 
 if "__main__" == __name__:
-    args = get_args()
+    #args = get_args()
+    test_data=r"data/input/test_data.csv"
+    model=r"data\models\rf"
+    split=None
+    milestone=1
 
-    test_data = args.test_data
-    model = args.saved_model
-    split = args.split
-    milestone = args.milestone
+    # test_data = args.test_data
+    # model = args.saved_model
+    # split = args.split
+    # milestone = args.milestone
 
     if milestone == 1:
         evaluate_milestone1(test_data, model, split=split)
