@@ -108,7 +108,7 @@ pip install pytest
 # Running the code
 First download all the resources that you need for the project. You can find all the information in the `data/README.md` file. We also provide pretrained models for evaluation.
 
-In the `scripts` folder you can find the scripts that you can use to train, evaluate and test your models. 
+In the `scripts` folder you can find the scripts that you can use to train, evaluate and test your models.
 
 We have two scripts implemented for you:
 - `train.py`: This script is used to train your models. It should expect a dataset file as an input and it should save the trained model in a file.
@@ -151,7 +151,8 @@ __Training__:
 To train a model on the IMDB dataset and then save the weights to a file, you can run a command:
 
 ```bash
-python scripts/train.py -t data/imdb_dataset_sample.csv -s -sp data/bayes_model.tsv -m 1
+python scripts/train.py -t data/train_data.csv -s -sp data/mlp_model.tsv -m 1
+
 ```
 
 __Evaluation__:
@@ -159,7 +160,7 @@ __Evaluation__:
 To evaluate the model on the dataset with a trained model, you can run a command (you can also provide a pretrained model, so if someone wants to evaluate your model, they can do it without training it):
 
 ```bash
-python scripts/evaluate.py -t data/imdb_dataset_sample.csv -sm data/bayes_model.tsv -sp -m 1
+python scripts/evaluate.py -t data/valid_data.csv -sm data/mlp_model.tsv -sp -m 1
 ```
 
 ## Run Milestone 2
@@ -173,7 +174,7 @@ To train the neural network on the IMDB dataset and then save the weights to a f
 ```
 
 __Evaluation__:
-    
+
 To evaluate the model on the dataset with the trained weights, you can run a command (you can also provide a pretrained model, so if someone wants to evaluate your model, they can do it without training it):
 
 ```bash

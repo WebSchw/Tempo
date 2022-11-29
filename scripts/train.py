@@ -34,10 +34,17 @@ def train_milestone2(train_data, save=False, save_path=None):
 
 
 def train_on_preprocessed_milestone_1(path_to_data, save=False, save_path=None):
-    #model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
-    model=classifier_deep = MLPClassifier(random_state=1, max_iter=290)
+
+
+    logger.info("Loading data...")
     features, labels = read_preprocessed_features(path_to_data)
     x, y = get_xy(features, labels)
+
+    logger.info("Loading model, random state fixed...")
+    #model = RandomForestClassifier(n_estimators=100, criterion='entropy', random_state=42)
+    model= MLPClassifier(random_state=1, max_iter=290)
+
+    logger.info("Training...")
     model.fit(x, y)
     if save:
         pickle.dump(model, open(save_path, 'wb'))
