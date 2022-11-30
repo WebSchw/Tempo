@@ -137,8 +137,12 @@ csv_files/
 # Should not be required anymore but is kept in case legacy data is locally stored
 data/input/
 data/csv_files
+<<<<<<< Updated upstream
 
 # Exclude actual data
 data/*.csv
 data/*.tsv
 
+=======
+data/*.csv
+>>>>>>> Stashed changes
