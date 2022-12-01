@@ -17,7 +17,8 @@ setup(
         "matplotlib==3.6.2",
         "seaborn==0.12.0",
         "stanza==1.4.2",
-        "tqdm~=4.64.1"
+        "tqdm~=4.64.1",
+        "transformers==4.24.0"
     ],
     packages=find_packages(),
     classifiers=[
