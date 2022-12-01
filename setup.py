@@ -16,7 +16,7 @@ setup(
         "requests==2.28.1",
         "matplotlib==3.6.2",
         "seaborn==0.12.0",
-        "stanza~=1.4.2",
+        "stanza==1.4.2",
         "tqdm~=4.64.1"
     ],
     packages=find_packages(),

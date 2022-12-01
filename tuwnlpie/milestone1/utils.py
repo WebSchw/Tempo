@@ -2,11 +2,10 @@ import csv
 import numpy as np
 from tqdm import tqdm
 import pandas as pd
-from os import path
 import nltk
 from data.get_data import get_data
-from os import getcwd
-from os import chdir
+from os import getcwd, chdir, path
+from tuwnlpie import logger
 
 
 def read_docs_from_csv(filename):
@@ -57,13 +56,17 @@ def read_preprocessed_features(data_path):
     dir_name = data_path.rsplit("/", 1)[0]
     current_dir = getcwd()
     if not path.exists(f"{dir_name}/{set_name}_data.csv"):
+        logger.info("downloading data...")
         chdir(dir_name)
         get_data(do_preprocess=False)
         chdir(current_dir)
+        logger.info("data downloaded successfully")
     if not path.exists(f"{dir_name}/{set_name}_features.csv"):
+        logger.info("preprocessing data...")
         chdir(dir_name)
         get_data(do_preprocess=True)
         chdir(current_dir)
+        logger.info("data preprocessed successfully")
     features = pd.read_csv(f"{dir_name}/{set_name}_features.csv")
     labels = pd.read_csv(f"{dir_name}/{set_name}_labels.csv")
     return features, labels
