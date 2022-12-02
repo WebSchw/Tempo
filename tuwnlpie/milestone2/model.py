@@ -1,33 +1,106 @@
+import pandas as pd
+from sklearn.preprocessing import MultiLabelBinarizer
+from data.constants import ALL_LABELS_SORTED
+import ast
+from transformers import AutoTokenizer, AutoModelForSequenceClassification,TrainingArguments,EvalPrediction
 import torch
-import torch.nn.functional as F
-from torch import nn
+import numpy as np
+from sklearn.metrics import f1_score, roc_auc_score, accuracy_score
+from transformers import  Trainer
 
 
-class BoWClassifier(nn.Module):  # inheriting from nn.Module!
-    def __init__(self, num_labels, vocab_size):
-        # calls the init function of nn.Module.  Dont get confused by syntax,
-        # just always do it in an nn.Module
-        super(BoWClassifier, self).__init__()
 
-        # Define the parameters that you will need.
-        # Torch defines nn.Linear(), which provides the affine map.
-        # Note that we could add more Linear Layers here connected to each other
-        # Then we would also need to have a HIDDEN_SIZE hyperparameter as an input to our model
-        # Then, with activation functions between them (e.g. RELU) we could have a "Deep" model
-        # This is just an example for a shallow network
-        self.linear = nn.Linear(vocab_size, num_labels)
+class BRISEDataset(torch.utils.data.Dataset):
+    def __init__(self, encodings, labels):
+        self.encodings = encodings
+        self.labels = labels
 
-    def forward(self, bow_vec, sequence_lens):
-        # Ignore sequence_lens for now!
-        # Pass the input through the linear layer,
-        # then pass that through log_softmax.
-        # Many non-linearities and other functions are in torch.nn.functional
-        # Softmax will provide a probability distribution among the classes
-        # We can then use this for our loss function
-        return F.log_softmax(self.linear(bow_vec), dim=1)
+    def __getitem__(self, idx):
+        #item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        item = {key: val[idx].clone().detach() for key, val in self.encodings.items()}
+        item['labels'] = torch.FloatTensor(self.labels.iloc[idx,2:])
+        return item
 
-    def save_model(self, filename):
-        torch.save(self.state_dict(), filename)
+    def __len__(self):
+        return len(self.labels)
 
-    def load_model(self, filename):
-        self.load_state_dict(torch.load(filename))
+def preprocess_labels(df: pd.DataFrame):
+    labels =  df.iloc[:, [0, 2]].copy()
+    labels.Labels = labels.Labels.apply(ast.literal_eval)
+    mlb = MultiLabelBinarizer(classes=list(ALL_LABELS_SORTED.keys()))
+    labels_transformed = mlb.fit_transform(labels['Labels'])
+    labels[mlb.classes_] = labels_transformed
+    return  labels
+
+
+def multi_label_metrics(predictions, labels, threshold=0.5):
+    # first, apply sigmoid on predictions which are of shape (batch_size, num_labels)
+    sigmoid = torch.nn.Sigmoid()
+    probs = sigmoid(torch.Tensor(predictions))
+    # next, use threshold to turn them into integer predictions
+    y_pred = np.zeros(probs.shape)
+    y_pred[np.where(probs >= threshold)] = 1
+    # finally, compute metrics
+    y_true = labels
+    f1_micro_average = f1_score(y_true=y_true, y_pred=y_pred, average='micro')
+    roc_auc = roc_auc_score(y_true, y_pred, average='micro')
+    accuracy = accuracy_score(y_true, y_pred)
+    # return as dictionary
+    metrics = {'f1': f1_micro_average,
+               'roc_auc': roc_auc,
+               'accuracy': accuracy}
+    return metrics
+
+
+def compute_metrics(p: EvalPrediction):
+    preds = p.predictions[0] if isinstance(p.predictions,
+                                           tuple) else p.predictions
+    result = multi_label_metrics(
+        predictions=preds,
+        labels=p.label_ids)
+    return result
+
+
+
+
+def train_model(data_path,save_path):
+    train_df = pd.read_csv(data_path + 'train_data.csv')
+    valid_df = pd.read_csv(data_path + 'valid_data.csv')
+    train_labels = preprocess_labels(train_df)
+    valid_labels = preprocess_labels(valid_df)
+
+    train_sent = train_df['Text'].tolist()
+    valid_sent = valid_df["Text"].tolist()
+
+    model_ckpt = "xlm-roberta-base"
+    tokenizer = AutoTokenizer.from_pretrained(model_ckpt, problem_type="multi_label_classification")
+
+    train_encodings = tokenizer(train_sent, truncation=True, padding=True, return_tensors='pt')
+    valid_encodings = tokenizer(valid_sent, truncation=True, padding=True, return_tensors='pt')
+    train_dataset = BRISEDataset(train_encodings, train_labels)
+    valid_dataset = BRISEDataset(valid_encodings, valid_labels)
+    model = AutoModelForSequenceClassification.from_pretrained(model_ckpt, num_labels=len(ALL_LABELS_SORTED),
+                                                               problem_type="multi_label_classification").to("cuda")
+
+    batch_size = 32
+    training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch",
+                                      num_train_epochs=6,
+                                      per_device_train_batch_size=batch_size,
+                                      per_device_eval_batch_size=batch_size,
+                                      optim="adamw_torch",
+                                      metric_for_best_model="f1",
+                                      save_strategy="no")
+
+
+    trainer = Trainer(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=valid_dataset,
+        compute_metrics=compute_metrics,
+    )
+
+    trainer.train()
+    if save_path is not None:
+        trainer.save_model(save_path)
+

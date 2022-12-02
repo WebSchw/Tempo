@@ -1,10 +1,9 @@
 import argparse
 import pickle
-
+from os import getcwd, chdir, path
 from sklearn.neural_network import MLPClassifier
 
 from tuwnlpie import logger
-from tuwnlpie.milestone1.model import SimpleNBClassifier
 from tuwnlpie.milestone1.utils import (
     calculate_tp_fp_fn,
     read_docs_from_csv,
@@ -12,23 +11,14 @@ from tuwnlpie.milestone1.utils import (
     read_preprocessed_features,
     get_xy
 )
-from sklearn.ensemble import RandomForestClassifier
-
-from tuwnlpie.milestone2.model import BoWClassifier
-from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
+from tuwnlpie.milestone2.model import train_model
 
 
-def train_milestone2(train_data, save=False, save_path=None):
+def train_milestone2(path_to_data, save=False, save_path=None):
     logger.info("Loading data...")
-    dataset = IMDBDataset(train_data)
-    model = BoWClassifier(dataset.OUT_DIM, dataset.VOCAB_SIZE)
-    trainer = Trainer(dataset=dataset, model=model)
 
-    logger.info("Training...")
-    trainer.training_loop(dataset.train_iterator, dataset.valid_iterator)
-
-    if save:
-        model.save_model(save_path)
+    path_to_data=path_to_data
+    train_model(path_to_data,save_path)
 
     return
 
