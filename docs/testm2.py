@@ -43,7 +43,8 @@ class BRISEDataset(torch.utils.data.Dataset):
         self.labels = labels
 
     def __getitem__(self, idx):
-        item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        #item = {key: torch.tensor(val[idx]) for key, val in self.encodings.items()}
+        item = {key: val[idx].clone().detach() for key, val in self.encodings.items()}
         item['labels'] = torch.FloatTensor(self.labels.iloc[idx,2:])
         return item
 
@@ -55,13 +56,6 @@ valid_dataset=BRISEDataset(valid_encodings,valid_labels)
 
 
 model = AutoModelForSequenceClassification.from_pretrained(model_ckpt,num_labels=len(ALL_LABELS_SORTED),problem_type="multi_label_classification").to("cuda")
-
-training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch",
-                                  num_train_epochs=5,
-                                  per_device_train_batch_size=16,
-                                  per_device_eval_batch_size=16,
-                                  optim="adamw_torch",
-                                  metric_for_best_model = "f1")
 
 
 # source: https://jesusleal.io/2021/04/21/Longformer-multilabel-classification/
@@ -91,6 +85,17 @@ def compute_metrics(p: EvalPrediction):
         predictions=preds,
         labels=p.label_ids)
     return result
+
+
+batch_size=32
+training_args = TrainingArguments(output_dir="test_trainer", evaluation_strategy="epoch",
+                                  num_train_epochs=6,
+                                  per_device_train_batch_size=batch_size,
+                                  per_device_eval_batch_size=batch_size,
+                                  optim="adamw_torch",
+                                  metric_for_best_model = "f1",
+                                  save_strategy = "epoch")
+
 
 from transformers import  Trainer
 trainer = Trainer(
