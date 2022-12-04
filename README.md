@@ -170,7 +170,7 @@ __Training__:
 To train the neural network on the IMDB dataset and then save the weights to a file, you can run a command:
 
 ```bash
- python scripts/train.py -t data/train_data.csv -v data/valid_data.csv -s -sp data/bow_model.pt -m 2
+ python scripts/train.py -t data/train_data.csv -v data/valid_data.csv -s -sp data/model.pt -m 2
 ```
 
 __Evaluation__:
@@ -178,7 +178,7 @@ __Evaluation__:
 To evaluate the model on the dataset with the trained weights, you can run a command (you can also provide a pretrained model, so if someone wants to evaluate your model, they can do it without training it):
 
 ```bash
-python scripts/evaluate.py -t data/test_data.csv -sm data/bow_model.pt -sp -m 2
+python scripts/evaluate.py -t data/test_data.csv -sm data/model.pt -sp -m 2
 ```
 
 # Running the tests
