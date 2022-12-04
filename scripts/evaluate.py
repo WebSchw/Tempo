@@ -1,5 +1,6 @@
 import argparse
 import pickle
+import numpy as np
 
 from sklearn.metrics import multilabel_confusion_matrix
 
@@ -59,6 +60,16 @@ def evaluate_milestone2(data_path, saved_model, split):
     print(f"F1-Score: {evaluation['eval_f1']}")
     print(f"ROC AUC: {evaluation['eval_roc_auc']}")
 
+    logger.info("Predicting...")
+    prediction = trainer.predict(test_dataset)
+    predictions = (np.sign(prediction.predictions)+1)/2
+    true_labels = test_dataset.labels.iloc[:,2:]
+    conf_matrix = multilabel_confusion_matrix(true_labels, predictions)
+    labels =  true_labels.columns
+    for index in range(len(conf_matrix)):
+        print(f"Confusion Matrix for Label: {labels[index]}:")
+        print(conf_matrix[index])
+        print("\n")
     return
 
 

@@ -146,4 +146,5 @@ data/*.tsv
 =======
 data/*.csv
 data/bow_model.pt/
+docs/test_trainer/
 >>>>>>> Stashed changes
