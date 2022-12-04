@@ -13,8 +13,10 @@ from tuwnlpie.milestone1.utils import (
     get_xy
 )
 
-from tuwnlpie.milestone2.model import BoWClassifier
-from tuwnlpie.milestone2.utils import IMDBDataset, Trainer
+from data.constants import ALL_LABELS_SORTED
+from tuwnlpie.milestone2.utils import compute_metrics, get_test_dataset
+from transformers import AutoModelForSequenceClassification
+from transformers import Trainer
 
 
 def evaluate_milestone1(test_data, saved_model):
@@ -34,23 +36,28 @@ def evaluate_milestone1(test_data, saved_model):
     return
 
 
-def evaluate_milestone2(test_data, saved_model, split):
+def evaluate_milestone2(data_path, saved_model, split):
+    logger.info("Loading model...")
+    model = AutoModelForSequenceClassification.from_pretrained(saved_model,num_labels=len(ALL_LABELS_SORTED),problem_type="multi_label_classification").to("cuda")
+    
     logger.info("Loading data...")
-    dataset = IMDBDataset(test_data)
-    model = BoWClassifier(dataset.OUT_DIM, dataset.VOCAB_SIZE)
-    model.load_model(saved_model)
-    trainer = Trainer(dataset=dataset, model=model)
+    test_dataset = get_test_dataset(data_path)
 
-    logger.info("Evaluating...")
-    test_loss, test_prec, test_rec, test_fscore = trainer.evaluate(
-        dataset.test_iterator
+    logger.info("Creating trainer...")
+    # Create trainer with loaded model
+    trainer = Trainer(
+        model=model,
+        compute_metrics=compute_metrics
     )
+    
+    logger.info("Evaluating...")
+    evaluation = trainer.evaluate(test_dataset)
 
     print("Statistics:")
-    print(f"Loss: {test_loss}")
-    print(f"Precision: {test_prec}")
-    print(f"Recall: {test_rec}")
-    print(f"F1-Score: {test_fscore}")
+    print(f"Loss: {evaluation['eval_loss']}")
+    print(f"Accuracy: {evaluation['eval_accuracy']}")
+    print(f"F1-Score: {evaluation['eval_f1']}")
+    print(f"ROC AUC: {evaluation['eval_roc_auc']}")
 
     return
 
