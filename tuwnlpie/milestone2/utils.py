@@ -34,7 +34,7 @@ def compute_metrics(p: EvalPrediction):
 
 
 def get_test_dataset(data_path):
-    test_df = pd.read_csv(data_path + 'test_data.csv')
+    test_df = pd.read_csv(data_path)
     test_labels = preprocess_labels(test_df)
     test_sent = test_df["Text"].tolist()
 

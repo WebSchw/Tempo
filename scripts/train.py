@@ -14,11 +14,10 @@ from tuwnlpie.milestone1.utils import (
 from tuwnlpie.milestone2.model import train_model
 
 
-def train_milestone2(path_to_data, save=False, save_path=None):
+def train_milestone2(training_data, valid_data, save=False, save_path=None):
     logger.info("Loading data...")
 
-    path_to_data=path_to_data
-    train_model(path_to_data,save_path)
+    train_model(training_data, valid_data, save, save_path)
 
     return
 
@@ -45,7 +44,10 @@ def train_on_preprocessed_milestone_1(path_to_data, save=False, save_path=None):
 def get_args():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument(
-        "-t", "--train-data", type=str, required=True, help="Path to folder in which are training data stored"
+        "-t", "--train-data", type=str, required=True, help="Path to the csv file containing training set"
+    )
+    parser.add_argument(
+        "-v", "--valid-data", type=str, required=False, help="Path to the csv file containing validation set"
     )
     parser.add_argument(
         "-s", "--save", default=False, action="store_true", help="Save model"
@@ -64,6 +66,7 @@ if "__main__" == __name__:
     args = get_args()
 
     train_data = args.train_data
+    valid_data = args.valid_data
     model_save = args.save
     model_save_path = args.save_path
     milestone = args.milestone
@@ -71,4 +74,4 @@ if "__main__" == __name__:
     if milestone == 1:
         train_on_preprocessed_milestone_1(train_data, save=model_save, save_path=model_save_path)
     elif milestone == 2:
-        train_milestone2(train_data, save=model_save, save_path=model_save_path)
+        train_milestone2(train_data, valid_data, save=model_save, save_path=model_save_path)

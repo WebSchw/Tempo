@@ -61,11 +61,9 @@ def compute_metrics(p: EvalPrediction):
     return result
 
 
-
-
-def train_model(data_path,save_path):
-    train_df = pd.read_csv(data_path + 'train_data.csv')
-    valid_df = pd.read_csv(data_path + 'valid_data.csv')
+def train_model(training_data, valid_data, save, save_path):
+    train_df = pd.read_csv(training_data)
+    valid_df = pd.read_csv(valid_data)
     train_labels = preprocess_labels(train_df)
     valid_labels = preprocess_labels(valid_df)
 
@@ -101,6 +99,6 @@ def train_model(data_path,save_path):
     )
 
     trainer.train()
-    if save_path is not None:
+    if save:
         trainer.save_model(save_path)
 
