@@ -1,4 +1,0 @@
-"Label","Regex","Recall","Precision","F1"
-"VerbotStaffelung","((staffel).*(nicht))|((nicht).*(staffel))|((staffel).*(untersagt))|((keine).*(staffel))|((innerhalb).*(umrisses).*(staffel).*(zulässig))",1.0,1.0,1.0
-"GesamtePlangebiet","((gesamt)[a-z]* plangebiet)",0.77,0.75,0.76
-"ErrichtungGebaeude","'die durch fluchtlinien abgegrenzten flächen [...]bestimmungen unmittelbar bebaut werden' or '[a-z]1(–|-)...-[a-z][0-9]+-\([a-z][0-9]\)'",0.07,1.0,0.13
